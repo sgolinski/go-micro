@@ -22,10 +22,10 @@ services:
       mode: replicated
       replicas: 1
 
-  mail-service:
+  mailer-service:
     build:
-      context: ./mail-service
-      dockerfile: ./mail-service.dockerfile
+      context: mailer-service
+      dockerfile: ./mailer-service.dockerfile
     restart: always
     deploy:
       mode: replicated
