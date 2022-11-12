@@ -19,7 +19,7 @@ func main() {
 		Mailer: createMail(),
 	}
 
-	log.Println("Starting mail service on port")
+	log.Println("Starting mail service on port", webPort)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
@@ -27,7 +27,6 @@ func main() {
 	}
 
 	err := srv.ListenAndServe()
-
 	if err != nil {
 		log.Panic(err)
 	}
@@ -35,7 +34,6 @@ func main() {
 
 func createMail() Mail {
 	port, _ := strconv.Atoi(os.Getenv("MAIL_PORT"))
-
 	m := Mail{
 		Domain:      os.Getenv("MAIL_DOMAIN"),
 		Host:        os.Getenv("MAIL_HOST"),

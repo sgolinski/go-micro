@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"net/http"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Consumer struct {
@@ -15,7 +16,6 @@ type Consumer struct {
 }
 
 func NewConsumer(conn *amqp.Connection) (Consumer, error) {
-
 	consumer := Consumer{
 		conn: conn,
 	}
@@ -24,14 +24,16 @@ func NewConsumer(conn *amqp.Connection) (Consumer, error) {
 	if err != nil {
 		return Consumer{}, err
 	}
+
 	return consumer, nil
 }
 
-func (consumer Consumer) setup() error {
+func (consumer *Consumer) setup() error {
 	channel, err := consumer.conn.Channel()
 	if err != nil {
 		return err
 	}
+
 	return declareExchange(channel)
 }
 
@@ -41,12 +43,10 @@ type Payload struct {
 }
 
 func (consumer *Consumer) Listen(topics []string) error {
-
 	ch, err := consumer.conn.Channel()
 	if err != nil {
 		return err
 	}
-
 	defer ch.Close()
 
 	q, err := declareRandomQueue(ch)
@@ -58,10 +58,11 @@ func (consumer *Consumer) Listen(topics []string) error {
 		ch.QueueBind(
 			q.Name,
 			s,
-			"logs_topics",
+			"logs_topic",
 			false,
 			nil,
 		)
+
 		if err != nil {
 			return err
 		}
@@ -77,27 +78,30 @@ func (consumer *Consumer) Listen(topics []string) error {
 		for d := range messages {
 			var payload Payload
 			_ = json.Unmarshal(d.Body, &payload)
+
 			go handlePayload(payload)
 		}
 	}()
 
-	fmt.Printf("Waiting for message on [Exchange,Queue] [logs_topics, %s] \n", q.Name)
+	fmt.Printf("Waiting for message [Exchange, Queue] [logs_topic, %s]\n", q.Name)
 	<-forever
+
 	return nil
 }
 
 func handlePayload(payload Payload) {
 	switch payload.Name {
 	case "log", "event":
-		//log whatever we get
+		// log whatever we get
 		err := logEvent(payload)
 		if err != nil {
 			log.Println(err)
 		}
-	case "auth":
-	// authenticate
 
-	// you can have as many cases as you want as long as you write the logic
+	case "auth":
+		// authenticate
+
+	// you can have as many cases as you want, as long as you write the logic
 
 	default:
 		err := logEvent(payload)
@@ -113,9 +117,7 @@ func logEvent(entry Payload) error {
 	logServiceURL := "http://logger-service/log"
 
 	request, err := http.NewRequest("POST", logServiceURL, bytes.NewBuffer(jsonData))
-
 	if err != nil {
-
 		return err
 	}
 
@@ -127,7 +129,6 @@ func logEvent(entry Payload) error {
 	if err != nil {
 		return err
 	}
-
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusAccepted {

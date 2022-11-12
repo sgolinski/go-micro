@@ -28,11 +28,11 @@ func main() {
 
 	// connect to DB
 	conn := connectToDB()
-
-	if conn != nil {
-		log.Panic("Can't connect to postgres")
+	if conn == nil {
+		log.Panic("Can't connect to Postgres!")
 	}
-	//set up config
+
+	// set up config
 	app := Config{
 		DB:     conn,
 		Models: data.New(conn),
@@ -44,17 +44,17 @@ func main() {
 	}
 
 	err := srv.ListenAndServe()
-
 	if err != nil {
 		log.Panic(err)
 	}
 }
+
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("pgx", dsn)
-
 	if err != nil {
 		return nil, err
 	}
+
 	err = db.Ping()
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func connectToDB() *sql.DB {
 			return nil
 		}
 
-		log.Println("Backing off fro two seconds....")
+		log.Println("Backing off for two seconds....")
 		time.Sleep(2 * time.Second)
 		continue
 	}
