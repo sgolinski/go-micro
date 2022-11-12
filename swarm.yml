@@ -1,10 +1,27 @@
 version: '3'
 
 services:
+
+  caddy:
+    image: szymgo/micro-caddy:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+  front-end:
+    image: szymgo/front-end:1.0.0
+    deploy:
+      mode: replicated
+      replicas: 1
+
   broker-service:
     image: szymgo/broker-service:1.0.1
-    ports:
-      - "8080:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -30,7 +47,7 @@ services:
       replicas: 1
 
   mailer-service:
-    image: szymgo/mailer-service:1.0.1
+    image: szymgo/mailer-service:1.0.0
     deploy:
       mode: replicated
       replicas: 1
@@ -82,3 +99,8 @@ services:
       POSTGRES_DB: users
     volumes:
       - ./db-data/postgres/:/var/lib/postgresql/data/
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
