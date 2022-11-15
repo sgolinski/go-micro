@@ -24,7 +24,7 @@ services:
 
   mailer-service:
     build:
-      context: mailer-service
+      context: mail-service
       dockerfile: ./mailer-service.dockerfile
     restart: always
     deploy:
