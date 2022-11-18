@@ -1,0 +1,35 @@
+// Remove old service
+
+kubectl get svc
+
+kubectl delete svc broker-service
+
+//exposing service loacly
+kubectl expose deployment broker-service --type=LoadBalancer --port=8080 --target-port=8080
+
+minikube tunnel
+
+go run ./cmd/web
+
+
+// remove services
+
+kubectl delete svc broker-service
+
+kubectl apply -f k8s/broker.yml
+
+kubectl apply -f k8s/front-end.yml
+
+minikube addons enable ingress
+
+kubectl apply -f ingress.uml
+
+kubectl get ingres
+
+sudo vi /etc/hosts
+
+*** AD
+127.0.0.1 front-end.info broker-service.info
+
+// open tunel
+minikube tunnel
